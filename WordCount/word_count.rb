@@ -31,6 +31,3 @@ class Phrase
   end
 
 end
-
-phrase = Phrase.new("Bob can't a live a 'long' a life.")
-p phrase.word_count
