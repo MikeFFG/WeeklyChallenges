@@ -1,4 +1,5 @@
-require 'pry'
+# frozen_string_literal: true
+
 class Triangle
   def initialize(num_rows)
     @num_rows = num_rows
@@ -9,21 +10,16 @@ class Triangle
 
     @num_rows.times do |index|
       row = []
-      items_in_this_row = index + 1
-      items_in_this_row.times do |item|
-        if item == 0 || item == items_in_this_row - 1
-          row << 1
-        else
-          value = triangle[index - 1][item - 1] + triangle[index - 1][item]
-          row << value
-        end
+
+      (index + 1).times do |item|
+        row << 1 && next if item == 0 || item == index
+        value = triangle[index - 1][item - 1] + triangle[index - 1][item]
+        row << value
       end
+
       triangle << row
     end
+
     triangle
   end
 end
-
-triangle = Triangle.new(4)
-
-p triangle.rows
