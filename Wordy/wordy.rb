@@ -1,4 +1,4 @@
-require 'pry'
+# frozen_string_literal: true
 
 class WordProblem
   def initialize(word_problem)
@@ -6,53 +6,40 @@ class WordProblem
   end
 
   def translate(word)
-    if word.to_i != 0
-      return word.to_i
+    return word.to_i if word.to_i != 0
+    case word
+    when 'plus' then '+'
+    when 'minus' then '-'
+    when '0' then 0
+    when 'multiplied' then '*'
+    when 'divided' then '/'
+    else
+      raise ArgumentError
     end
-    new_word = case word
-               when 'plus'
-                 '+'
-               when 'minus'
-                 '-'
-               when '0'
-                 0
-               when 'multiplied'
-                 '*'
-               when 'divided'
-                 '/'
-               else
-                 raise ArgumentError
-               end
-    new_word
   end
 
-  def simplify!(word_array)
-    word_array.delete_at(0)
-    word_array.delete_at(0)
-    word_array[word_array.size - 1] = word_array.last.downcase.gsub!(/[?]/, ' ').rstrip
-    word_array
+  def simplify!
+    @word_problem = @word_problem.split
+    @word_problem.delete('by')
+
+    if @word_problem[0] != 'What' then raise ArgumentError
+    elsif @word_problem.size.even? then raise ArgumentError
+    end
+
+    @word_problem.slice!(0..1)
+    final_word_stripped = @word_problem.last.downcase.gsub!(/[?]/, ' ').rstrip!
+    @word_problem[@word_problem.size - 1] = final_word_stripped
   end
 
   def answer
-    word_array = @word_problem.split
-    word_array.delete('by')
-    if word_array[0] != 'What'
-      raise ArgumentError
-    elsif !word_array.size.odd?
-      raise ArgumentError
-    end
-    simplify!(word_array)
-    answer = 0
-    if word_array.size == 3
-      answer = translate(word_array[0]).send(translate(word_array[1]), translate(word_array[2]))
-    elsif word_array.size == 5
-      answer1 = translate(word_array[0]).send(translate(word_array[1]), translate(word_array[2]))
-      answer = answer1.send(translate(word_array[3]), translate(word_array[4]))
+    simplify!
+    translated_array = @word_problem.map { |word| translate(word) }
+
+    if translated_array.size == 3
+      translated_array[0].send(translated_array[1], translated_array[2])
+    elsif translated_array.size == 5
+      part1 = translated_array[0].send(translated_array[1], translated_array[2])
+      part1.send(translated_array[3], translated_array[4])
     end
   end
-
 end
-
-wordproblem = WordProblem.new('What is 1 plus 1 plus 1?')
-
-p wordproblem.answer

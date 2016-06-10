@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Anagram
   def initialize(word)
     @word = word.downcase
@@ -13,6 +15,4 @@ class Anagram
     end
     results
   end
-
-
 end
