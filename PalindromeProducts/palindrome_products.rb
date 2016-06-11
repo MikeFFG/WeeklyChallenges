@@ -1,67 +1,43 @@
-require 'pry'
-
-module Limitable
-  def min_factor
-    @limits[:min_factor] || 1
-  end
-
-  def max_factor
-    @limits[:max_factor]
-  end
-end
-
 class Palindromes
-  include Limitable
 
-  attr_reader :values, :factors, :min_factor, :max_factor
-  def initialize(factor_limits)
-    @limits = factor_limits
-    @values = []
-    @factors = []
+  def initialize(args)
+    @max = args[:max_factor]
+    @min = args[:min_factor] || 1
+    @largest = Single_Palindrome.new(-1, [])
+    @smallest = Single_Palindrome.new(-1, []) 
   end
 
   def generate
-    min_factor = @limits[:min_factor].to_i
-    max_factor = @limits[:max_factor].to_i
-    (min_factor..max_factor).each do |first_factor|
-      (min_factor..max_factor).each do |second_factor|
-        possibility = first_factor * second_factor
-        possibility_array = possibility.to_s.split(//).to_a
-        if possibility_array == possibility_array.reverse
-          @values << possibility
-          @factors << [first_factor, second_factor]
+    (@min..@max).each do |outer_num|
+      (@min..@max).each do |inner_num|
+        multiplication = outer_num * inner_num
+        if multiplication.to_s == multiplication.to_s.reverse
+          if multiplication < @smallest.value || @smallest.value == -1
+            @smallest.value = multiplication
+            @smallest.factors = [inner_num, outer_num]
+          elsif multiplication > @largest.value || @largest.value == -1
+            @largest.value = multiplication
+            @largest.factors = [inner_num, outer_num]
+          end
         end
       end
     end
-    @values.uniq!
   end
 
   def largest
-    palindrome = Single_Palindrome.new(@values.sort.last, @factors)
+    @largest
   end
 
   def smallest
-    palindrome = Single_Palindrome.new(@values.sort.first, @factors)
+    @smallest
   end
 end
 
 class Single_Palindrome
-  include Limitable
-  attr_reader :value
+  attr_accessor :value, :factors
+
   def initialize(value, factors)
     @value = value
     @factors = factors
   end
-
-  def factors
-    resultant_factors = []
-    resultant_factors = @factors.select { |array| array[0] * array[1] == value }
-    resultant_factors.uniq!
-    resultant_factors
-  end
 end
-
-palindromes = Palindromes.new(max_factor: 9, min_factor: 1)
-palindromes.generate
-largest = palindromes.largest
-p largest.factors
