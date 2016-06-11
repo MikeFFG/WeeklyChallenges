@@ -8,16 +8,20 @@ class Palindromes
   end
 
   def generate
-    (@min..@max).each do |outer_num|
+    (@min..@max-1).each do |outer_num|
       (@min..@max).each do |inner_num|
         multiplication = outer_num * inner_num
         if multiplication.to_s == multiplication.to_s.reverse
           if multiplication < @smallest.value || @smallest.value == -1
             @smallest.value = multiplication
-            @smallest.factors = [inner_num, outer_num]
+            @smallest.factors = [[outer_num, inner_num]]
+          elsif multiplication == @smallest.value
+            @smallest.factors += [[outer_num, inner_num]]
           elsif multiplication > @largest.value || @largest.value == -1
             @largest.value = multiplication
-            @largest.factors = [inner_num, outer_num]
+            @largest.factors = [[outer_num, inner_num]]
+          elsif multiplication == @largest.value
+            @largest.factors += [[outer_num, inner_num]]
           end
         end
       end
